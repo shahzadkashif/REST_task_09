@@ -1,9 +1,7 @@
 1. Setup a virtual environment.
-2. Fork the repository for [Django REST Task 3](https://github.com/JoinCODED/REST_task_03/) in JoinCODED’s Github and Clone it.
+2. Fork the repository for [Django REST Task 9](https://github.com/JoinCODED/REST_task_09/) in JoinCODED’s Github and Clone it.
 3. Install the packages from the requirements file.
-4. Create a Restaurant create API view:
-    * It should use the same serializer as the update view.
-    * Get the flight id from the url.
-    * Create a `URL` for this view and test it in `postman`.
-    * Replace the api in the **frontends** `book` view with this api.
-7. Push your code
+6. Create a signal that creates a new `Profile` object for a user everytime a new `User` is **created**.
+4. Create a signal that adds the booked flight miles to the users profile everytime a new `Booking` is **created**.
+5. Create a signal that removes the cancelled booking miles from the users profile everytime a `Booking` is deleted.
+6. Push your code.
