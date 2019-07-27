@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 from rest_framework.test import APITestCase
 from rest_framework import status
 from datetime import date, timedelta
-
+from django.db.models import Sum
+from django.db.models.functions import Coalesce
 from .models import Flight, Booking, Profile
 
 
@@ -186,6 +187,15 @@ class BookingUpdate(APITestCase):
 		response = self.client.put(reverse('update-booking', args=[3]), data)
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
+	def test_miles(self):
+		data = {"date": "2019-05-05", "passengers": 4}
+		booking_id = 4
+		miles = Booking.objects.filter(user_id=1).aggregate(sum=Coalesce(Sum('flight__miles'), 0))
+		response = self.client.post(reverse('login'), {"username":"laila", "password":"1234567890-="})
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
+		response = self.client.put(reverse('update-booking', args=[booking_id]), data)		
+		self.assertEqual(Profile.objects.get(id=1).miles, miles['sum'])
+
 	def test_update_admin(self):
 		data = {"date": "2019-05-05", "passengers": 4}
 
@@ -266,6 +276,17 @@ class BookingDelete(APITestCase):
 		self.assertEqual(Booking.objects.all().count(), 3)
 		self.assertEqual(Booking.objects.filter(id=4).count(), 0)
 
+
+	def test_miles(self):
+		miles = Booking.objects.filter(user_id=1).aggregate(Sum('flight__miles'))
+
+		response = self.client.post(reverse('login'), {"username":"laila", "password":"1234567890-="})
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
+		response = self.client.delete(reverse('cancel-booking', args=[4]))
+		miles = miles['flight__miles__sum'] - Flight.objects.get(id=2).miles
+		self.assertEqual(Profile.objects.get(id=1).miles, miles)
+
+
 	def test_delete_admin(self):
 		response = self.client.post(reverse('login'), {"username":"admin", "password":"1234567890-="})
 		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
@@ -328,6 +349,16 @@ class BookingCreate(APITestCase):
 	def test_url_unauthorized(self):
 		response = self.client.post(reverse('book-flight', args=[1]), self.data)
 		self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+
+	def test_miles(self):
+		flight_id = 1
+		miles = Booking.objects.filter(user_id=1).aggregate(sum=Coalesce(Sum('flight__miles'), 0))
+		response = self.client.post(reverse('login'), {"username":"laila", "password":"1234567890-="})
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
+		response = self.client.post(reverse('book-flight', args=[flight_id]), self.data)		
+		miles = miles['sum'] + Flight.objects.get(id=flight_id).miles
+		self.assertEqual(Profile.objects.get(id=1).miles, miles)
 		
 
 	def test_creation_works(self):
