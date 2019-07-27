@@ -53,7 +53,7 @@ class CancelBooking(DestroyAPIView):
 
 
 class BookFlight(CreateAPIView):
-	serializer_class = UpdateBookingSerializer
+	serializer_class = AdminUpdateBookingSerializer
 	permission_classes = [IsAuthenticated]
 
 	def perform_create(self, serializer):
@@ -66,6 +66,7 @@ class Register(CreateAPIView):
 
 class ProfileDetails(RetrieveAPIView):
 	serializer_class = ProfileSerializer
+	permission_classes = [IsAuthenticated]
 
 	def get_object(self):
 		return self.request.user.profile
