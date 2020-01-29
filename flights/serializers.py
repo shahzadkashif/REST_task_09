@@ -28,7 +28,7 @@ class BookingDetailsSerializer(serializers.ModelSerializer):
 		fields = ['flight', 'date', 'passengers', 'id', 'total']
 
 	def get_total(self, obj):
-		return obj.number_of_travellers*obj.flight.price
+		return obj.passengers*obj.flight.price
 
 class AdminUpdateBookingSerializer(serializers.ModelSerializer):
 	class Meta:
