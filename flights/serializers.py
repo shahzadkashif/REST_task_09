@@ -86,5 +86,3 @@ class ProfileSerializer(serializers.ModelSerializer):
 			return "Gold"
 		else:
 			return "Platinum"
-
-

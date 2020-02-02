@@ -188,16 +188,16 @@ class BookingUpdate(APITestCase):
 		self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 	def test_miles(self):
-		data = {"date": "2019-05-05", "passengers": 4}
+		data = {"date": "2021-05-05", "passengers": 4}
 		booking_id = 4
 		miles = Booking.objects.filter(user_id=1).aggregate(sum=Coalesce(Sum('flight__miles'), 0))
-		response = self.client.post(reverse('login'), {"username":"laila", "password":"1234567890-="})
+		response = self.client.post(reverse('login'), {"username":"laila2", "password":"1234567890-="})
 		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
 		response = self.client.put(reverse('update-booking', args=[booking_id]), data)		
 		self.assertEqual(Profile.objects.get(id=1).miles, miles['sum'])
 
 	def test_update_admin(self):
-		data = {"date": "2019-05-05", "passengers": 4}
+		data = {"date": "2020-05-05", "passengers": 4}
 
 		response = self.client.post(reverse('login'), {"username":"admin", "password":"1234567890-="})
 		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + response.data['access'])
@@ -473,6 +473,3 @@ class ProfileDetails(APITestCase):
 			tier =  "Platinum"
 
 		self.assertEqual(response.data['tier'], tier) 
-
-
-
